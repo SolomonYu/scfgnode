@@ -29,11 +29,7 @@ MongoClient.connect(dburl, function(err, client){
   //collection.deleteMany();
 });
 
-var sampleUser = {
-  name: "billybob",
-  email: "billybob@yes.com",
-  description: "i like chocolate milk",
-};
+
 
 //app
 // parsing body
@@ -53,13 +49,13 @@ app.use('/', function(req,res,next){
 });
 
 app.use('/', express.static('./pub_html', options));
-app.use('/files', serverIndex('pub_html/files', {'icons': true}));
+app.use(express.json());
 
 
 //For signing in: See if user exists, if not, then put a new user into db
 //at the moment, also use this for getting user info
-app.get('/signin', function(req,res,next){
-  var userToFind = req.body;
+app.post('/signin', function(req,res,next){
+  var userToFind = req.body.email;
   var existingusers = users.find({"email": userToFind}).count()
   .then(function(login){
       console.log("checking if user exists");
@@ -81,10 +77,15 @@ function existCheck(req,res,next,existingusers,userToFind){
       loadThisUser(req,res,next,loadeduser);
     });
 
-    //res.end();
+    //res.end(); 
   }
   else{
     console.log("Player has been registered");
+    var sampleUser = {
+      fullName: req.body.fullName,
+      email: req.body.email,
+      description: ""
+    };
     console.log(sampleUser);
     //put player into database
     users.insertOne(sampleUser, (err,resulet) => {
