@@ -33,7 +33,6 @@ var sampleUser = {
   name: "billybob",
   email: "billybob@yes.com",
   description: "i like chocolate milk",
-  location: 1
 };
 
 //app
@@ -59,24 +58,24 @@ app.use('/files', serverIndex('pub_html/files', {'icons': true}));
 
 //For signing in: See if user exists, if not, then put a new user into db
 //at the moment, also use this for getting user info
-app.get(/signin/, function(req,res,next){
-  var usertofind = "billybob@yes.com"
-  var existingusers = users.find({"email": usertofind}).count()
+app.get('/signin', function(req,res,next){
+  var userToFind = req.body;
+  var existingusers = users.find({"email": userToFind}).count()
   .then(function(login){
       console.log("checking if user exists");
       existingusers = login;
-      existCheck(req,res,next,existingusers,usertofind);
+      existCheck(req,res,next,existingusers,userToFind);
     });
 
 });
 
-function existCheck(req,res,next,existingusers,usertofind){
+function existCheck(req,res,next,existingusers,userToFind){
   var userjson;
   var loadeduser;
   if (existingusers >= 1){
     console.log("user already exists");
     //load user info
-    users.findOne({"email": usertofind})
+    users.findOne({"email": userToFind})
     .then(function(tempuser){
       loadeduser = tempuser;
       loadThisUser(req,res,next,loadeduser);
@@ -92,7 +91,7 @@ function existCheck(req,res,next,existingusers,usertofind){
       if (err) console.log(err);
     });
     //load user info
-    users.findOne({"email": usertofind})
+    users.findOne({"email": userToFind})
     .then(function(tempuser){
       loadeduser = tempuser;
       loadThisUser(req,res,next,loadeduser);
@@ -106,14 +105,13 @@ function existCheck(req,res,next,existingusers,usertofind){
 function loadThisUser(req,res,next,loadeduser){
   console.log(loadeduser);
   console.log("loaded user info");
-  console.log(req.query.id);
   res.send(loadeduser);
   res.end();
 }
 
 
 //updates database.. assume user also is updated locally, in interest of time
-app.get(/updateinfo/, function(req,res,next){
+app.get('/updateinfo/', function(req,res,next){
   var fieldToUpdate = "name";
   var aspectToUpdate = "newname";
   var userToUpdate = "solomon@yes.com";
@@ -132,7 +130,7 @@ app.get(/updateinfo/, function(req,res,next){
 
 
 ///show all users in database
-app.get(/displayall/, function(req,res,next){
+app.get('/displayall', function(req,res,next){
   var userArray;
   postings.find({}).toArray()
   .then(function(tempArray){
@@ -141,10 +139,15 @@ app.get(/displayall/, function(req,res,next){
   });
 });
 
-app.get(/test/, function(req,res,next){
+app.get('/test/', function(req,res,next){
   res.send("everything working");
   console.log("test initiated");
   res.end();
+});
+
+app.post('/makeuser', function(req,res,next){
+
+
 });
 
 
