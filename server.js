@@ -74,7 +74,7 @@ function existCheck(req,res,next,existingusers,userToFind){
     users.findOne({"email": userToFind})
     .then(function(tempuser){
       loadeduser = tempuser;
-      loadThisUser(req,res,next,loadeduser);
+      loadThisThing(req,res,next,loadeduser);
     });
 
     //res.end(); 
@@ -88,14 +88,14 @@ function existCheck(req,res,next,existingusers,userToFind){
     };
     console.log(sampleUser);
     //put player into database
-    users.insertOne(sampleUser, (err,resulet) => {
+    users.insertOne(sampleUser, (err,result) => {
       if (err) console.log(err);
     });
     //load user info
     users.findOne({"email": userToFind})
     .then(function(tempuser){
       loadeduser = tempuser;
-      loadThisUser(req,res,next,loadeduser);
+      loadThisThing(req,res,next,loadeduser);
     });
 
     //res.end();
@@ -103,10 +103,10 @@ function existCheck(req,res,next,existingusers,userToFind){
   }
 }
 
-function loadThisUser(req,res,next,loadeduser){
-  console.log(loadeduser);
-  console.log("loaded user info");
-  res.send(loadeduser);
+function loadThisThing(req,res,next,toLoad){
+  console.log(toLoad);
+  console.log("above object loaded");
+  res.send(toLoad);
   res.end();
 }
 
@@ -136,7 +136,7 @@ app.get('/displayall', function(req,res,next){
   postings.find({}).toArray()
   .then(function(tempArray){
     userArray = tempArray;
-    loadThisUser(req,res,next,userArray);
+    loadThisThing(req,res,next,userArray);
   });
 });
 
@@ -146,8 +146,25 @@ app.get('/test/', function(req,res,next){
   res.end();
 });
 
-app.post('/makeuser', function(req,res,next){
+app.post('/makePost', function(req,res,next){
+  var samplePost = {
+    email: res.body.email,
+    time: res.body.time,
+    distance: res.body.distance,
+    latitude: res.body.latitude,
+    longitude: res.body.longitude
+  };
 
+    postings.insertOne(samplePost, (err,result) => {
+      if (err) console.log(err);
+    });
+    //load user info
+    var userArray;
+    postings.find({}).toArray()
+    .then(function(tempArray){
+    userArray = tempArray;
+    loadThisThing(req,res,next,userArray);
+  });
 
 });
 
