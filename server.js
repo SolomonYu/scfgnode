@@ -1,4 +1,4 @@
-//Author: Solomon Yu
+ //Author: Solomon Yu
 //June 2018
 
 
@@ -136,6 +136,12 @@ app.get(/displayall/, function(req,res,next){
     userArray = tempArray;
     loadThisUser(req,res,next,userArray);
   });
+});
+
+app.get(/test/, function(req,res,next){
+  res.send("everything working");
+  console.log("test initiated");
+  res.end();
 });
 
 
