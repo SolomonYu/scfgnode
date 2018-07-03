@@ -17,12 +17,15 @@ var port = process.env.PORT || 3000;
 
 var dburl = "mongodb://admin:123456a@ds018238.mlab.com:18238/scfgdatabase";
 var database;
-var collection;
+var users;
+var postings;
 MongoClient.connect(dburl, function(err, client){
   if (err) console.log(err);
   console.log('database connected');
   database = client.db('scfgdatabase'); // use
-  collection = database.collection('documents'); // db.documents
+  users = database.collection('users'); // db.documents
+  postings = database.collection('postings');
+
   //collection.deleteMany();
 });
 
@@ -58,7 +61,7 @@ app.use('/files', serverIndex('pub_html/files', {'icons': true}));
 //at the moment, also use this for getting user info
 app.get(/signin/, function(req,res,next){
   var usertofind = "billybob@yes.com"
-  var existingusers = collection.find({"email": usertofind}).count()
+  var existingusers = users.find({"email": usertofind}).count()
   .then(function(login){
       console.log("checking if user exists");
       existingusers = login;
@@ -73,7 +76,7 @@ function existCheck(req,res,next,existingusers,usertofind){
   if (existingusers >= 1){
     console.log("user already exists");
     //load user info
-    collection.findOne({"email": usertofind})
+    users.findOne({"email": usertofind})
     .then(function(tempuser){
       loadeduser = tempuser;
       loadThisUser(req,res,next,loadeduser);
@@ -85,11 +88,11 @@ function existCheck(req,res,next,existingusers,usertofind){
     console.log("Player has been registered");
     console.log(sampleUser);
     //put player into database
-    collection.insertOne(sampleUser, (err,resulet) => {
+    users.insertOne(sampleUser, (err,resulet) => {
       if (err) console.log(err);
     });
     //load user info
-    collection.findOne({"email": usertofind})
+    users.findOne({"email": usertofind})
     .then(function(tempuser){
       loadeduser = tempuser;
       loadThisUser(req,res,next,loadeduser);
@@ -119,7 +122,7 @@ app.get(/updateinfo/, function(req,res,next){
   var toSearchfor = { "email": userToUpdate };
   var toSet = { $set: { name : aspectToUpdate } };
 
-  collection.update(toSearchfor,toSet, function(err,res){
+  users.update(toSearchfor,toSet, function(err,res){
     if(err) throw err;
     console.log("user updated");
   });
@@ -131,7 +134,7 @@ app.get(/updateinfo/, function(req,res,next){
 ///show all users in database
 app.get(/displayall/, function(req,res,next){
   var userArray;
-  collection.find({}).toArray()
+  postings.find({}).toArray()
   .then(function(tempArray){
     userArray = tempArray;
     loadThisUser(req,res,next,userArray);
