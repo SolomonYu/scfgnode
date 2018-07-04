@@ -174,8 +174,8 @@ function afterMakePost(req,res,next,existingPosts,samplePost){
   // }
   // else{
     console.log("Post has been added");
-    console.log(sampleUser);
-    postings.insertOne(sampleUser, (err,result) => {
+    console.log(samplePost);
+    postings.insertOne(samplePost, (err,result) => {
       if (err) console.log(err);
     });
   //}
