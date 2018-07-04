@@ -194,9 +194,9 @@ function afterMakePost(req,res,next,existingPosts,samplePost){
     console.log("calcdistance entered: " + givenLatitude);
     console.log(destLatitude);
     console.log(kmApart);
-    if ((givenLatitude - kmApart) >= destLatitude){
+    if ((givenLatitude - kmApart) >= destLatitude || (givenLatitude + kmApart) <= destLatitude){
       console.log("lat okay");
-      if((givenLongitude - kmApart) >= destLongitude){
+      if((givenLongitude - kmApart) >= destLongitude || (givenLongitude + kmApart) <= destLongitude){
         console.log("long okay");
         return true;
       }
