@@ -191,6 +191,7 @@ function afterMakePost(req,res,next,existingPosts,samplePost){
 //return either true or false based on whether desination is within kmApart
   function calculateDistance(givenLatitude,givenLongitude,kmApart,destLatitude,destLongitude){
     var latlongApart = kmApart/111.133;
+    console.log("calcdistance entered: " + givenLatitude);
     if (givenLatitude + kmApart <= destLatitude && givenLatitude - kmApart >= destLatitude){
       console.log("lat okay");
       if(givenLongitude + kmApart <= destLongitude && givenLongitude - kmApart >= destLongitude){
@@ -206,6 +207,7 @@ function afterMakePost(req,res,next,existingPosts,samplePost){
   console.log("Number of items in array: " + userArray.length);
   var newArray = [];
   for(var i = 0; i < userArray.length; i++){
+    console.log("i = " + i);
     if (calculateDistance(samplePost.latitude,samplePost.longitude,samplePost.distance,userArray[i].latitude,userArray[i].longitude)){
       newArray.push(userArray[i]);
       console.log("post pushed");
