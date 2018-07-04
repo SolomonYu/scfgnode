@@ -45,6 +45,7 @@ var options = {
   index: "index.html"
 }
 
+//viewing the request in console
 app.use('/', function(req,res,next){
   console.log(req.method, 'request:', req.url, JSON.stringify(req.body));
   next();
@@ -103,6 +104,7 @@ function existCheck(req,res,next,existingusers,userToFind){
   }
 }
 
+//sends whatever object(toLoad) is passed through this function
 function loadThisThing(req,res,next,toLoad){
   console.log(toLoad);
   console.log("above object loaded");
@@ -112,6 +114,7 @@ function loadThisThing(req,res,next,toLoad){
 
 
 //updates database.. assume user also is updated locally, in interest of time
+//atm, this is just for testing
 app.get('/updateinfo/', function(req,res,next){
   var fieldToUpdate = "name";
   var aspectToUpdate = "newname";
@@ -131,6 +134,7 @@ app.get('/updateinfo/', function(req,res,next){
 
 
 ///show all users in database
+//for testing purposes only, to be removed in final version
 app.get('/displayall', function(req,res,next){
   var userArray;
   postings.find({}).toArray()
@@ -146,6 +150,7 @@ app.get('/test/', function(req,res,next){
   res.end();
 });
 
+//creating a post, takes a posting object as a json from client
 app.post('/makePost', function(req,res,next){
   console.log(req.body);
 
@@ -167,6 +172,7 @@ app.post('/makePost', function(req,res,next){
 
 });
 
+//to prevent async problems in making a post
 function afterMakePost(req,res,next,existingPosts,samplePost){
   var userjson;
   var loadeduser;
@@ -205,6 +211,7 @@ function afterMakePost(req,res,next,existingPosts,samplePost){
     return false;
   }
 
+//making only nearby users show up, will also filter diet restrictions in future
   function loadAndFilterArray(req,res,next,userArray,samplePost){
   console.log(userArray);
   console.log("Number of items in array: " + userArray.length);
@@ -229,7 +236,7 @@ function afterMakePost(req,res,next,existingPosts,samplePost){
 
 //dealing with 404 page
 app.use(function (req, res, next) {
-  res.status(404).send("*notices your error page* OwO what's this?");
+  res.status(404).send("Error!");
 });
 
 
