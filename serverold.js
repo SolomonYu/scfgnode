@@ -1,7 +1,5 @@
-//Author: Solomon Yu
+ //Author: Solomon Yu
 //June 2018
-//For cmpt 276 Dine Together Project
-//Team members: Savtoz, Justin, Austin, Raad
 
 
 
@@ -79,6 +77,7 @@ function existCheck(req,res,next,existingusers,userToFind){
       loadThisThing(req,res,next,loadeduser);
     });
 
+    //res.end(); 
   }
   else{
     console.log("Player has been registered");
@@ -99,6 +98,7 @@ function existCheck(req,res,next,existingusers,userToFind){
       loadThisThing(req,res,next,loadeduser);
     });
 
+    //res.end();
 
   }
 }
@@ -157,64 +157,19 @@ app.post('/makePost', function(req,res,next){
     longitude: req.body.longitude
   };
 
-  var existingPosts = users.find({"email": req.body.email}).count()
-  .then(function(postResult){
-      console.log("checking if post exists");
-      existingPosts = postResult;
-      afterMakePost(req,res,next,existingPosts,samplePost);
-    });
-
-});
-
-function afterMakePost(req,res,next,existingPosts,samplePost){
-  var userjson;
-  var loadeduser;
-  if (existingPosts >= 1){
-    console.log("Post already exists");
-  }
-  else{
-    console.log("Post has been added");
-    console.log(sampleUser);
-    postings.insertOne(sampleUser, (err,result) => {
+    postings.insertOne(samplePost, (err,result) => {
       if (err) console.log(err);
     });
-  }
-    //load all posts info
+    //load user info
     var userArray;
     postings.find({}).toArray()
     .then(function(tempArray){
-      userArray = tempArray;
-      loadAndFilterArray(req,res,next,userArray,samplePost);
-    });
-}
+    userArray = tempArray;
+    loadThisThing(req,res,next,userArray);
+  });
 
-//return either true or false based on whether desination is within kmApart
-  function calculateDistance(givenLatitude,givenLongitude,kmApart,destLatitude,destLongitude){
-    var latlongApart = kmApart/111.133;
-    if (givenLatitude + latlongApart <= destLatitude && 
-      givenLatitude - latlongApart >= destLatitude){
-      if(givenLongitude + latlongApart <= destLongitude && 
-        givenLongitude - latlongApart >= destLongitude){
-        return true;
-      }
-    } 
-    return false;
-  }
+});
 
-  function loadAndFilterArray(req,res,next,userArray,samplePost){
-  console.log(userArray);
-  console.log("Number of items in array: " + userArray.length);
-  var newArray = [];
-  for(var i = 0; i < userArray.length; i++){
-    if (calculateDistance(samplePost.latitude,samplePost.longitude,samplePost.distance,userArray[i].latitude,userArray[i].longitude)){
-      newArray.push(userArray[i]);
-    }
-  }
-  console.log("New array:");
-  console.log(newArray);
-  res.send(newArray);
-  res.end();
-}
 
 
 
