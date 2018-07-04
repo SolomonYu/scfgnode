@@ -147,6 +147,8 @@ app.get('/test/', function(req,res,next){
 });
 
 app.post('/makePost', function(req,res,next){
+  console.log(res.body);
+  
   var samplePost = {
     email: res.body.email,
     time: res.body.time,
