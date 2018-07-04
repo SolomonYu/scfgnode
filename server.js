@@ -157,7 +157,7 @@ app.post('/makePost', function(req,res,next){
     longitude: req.body.longitude
   };
 
-  var existingPosts = users.find({"email": req.body.email}).count()
+  var existingPosts = postings.find({"email": req.body.email}).count()
   .then(function(postResult){
       console.log("checking if post exists");
       existingPosts = postResult;
