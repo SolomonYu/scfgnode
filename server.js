@@ -157,28 +157,28 @@ app.post('/makePost', function(req,res,next){
     longitude: req.body.longitude
   };
 
-  var existingPosts = postings.find({"email": req.body.email}).count()
-  .then(function(postResult){
-      console.log("checking if post exists");
-      existingPosts = postResult;
+  // var existingPosts = postings.find({"email": req.body.email}).count()
+  // .then(function(postResult){
+  //     console.log("checking if post exists");
+  //     existingPosts = postResult;
       afterMakePost(req,res,next,existingPosts,samplePost);
-    });
+    // });
 
 });
 
 function afterMakePost(req,res,next,existingPosts,samplePost){
   var userjson;
   var loadeduser;
-  if (existingPosts >= 1){
-    console.log("Post already exists");
-  }
-  else{
+  // if (existingPosts >= 1){
+  //   console.log("Post already exists");
+  // }
+  // else{
     console.log("Post has been added");
     console.log(sampleUser);
     postings.insertOne(sampleUser, (err,result) => {
       if (err) console.log(err);
     });
-  }
+  //}
     //load all posts info
     var userArray;
     postings.find({}).toArray()
