@@ -147,14 +147,14 @@ app.get('/test/', function(req,res,next){
 });
 
 app.post('/makePost', function(req,res,next){
-  console.log(res.body);
-  
+  console.log(req.body);
+
   var samplePost = {
-    email: res.body.email,
-    time: res.body.time,
-    distance: res.body.distance,
-    latitude: res.body.latitude,
-    longitude: res.body.longitude
+    email: req.body.email,
+    time: req.body.time,
+    distance: req.body.distance,
+    latitude: req.body.latitude,
+    longitude: req.body.longitude
   };
 
     postings.insertOne(samplePost, (err,result) => {
