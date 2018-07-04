@@ -192,6 +192,8 @@ function afterMakePost(req,res,next,existingPosts,samplePost){
   function calculateDistance(givenLatitude,givenLongitude,kmApart,destLatitude,destLongitude){
     var latlongApart = kmApart/111.133;
     console.log("calcdistance entered: " + givenLatitude);
+    console.log(destLatitude);
+    console.log(kmApart);
     if (givenLatitude + kmApart <= destLatitude && givenLatitude - kmApart >= destLatitude){
       console.log("lat okay");
       if(givenLongitude + kmApart <= destLongitude && givenLongitude - kmApart >= destLongitude){
