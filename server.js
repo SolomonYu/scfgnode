@@ -156,7 +156,7 @@ app.post('/makePost', function(req,res,next){
     latitude: req.body.latitude,
     longitude: req.body.longitude
   };
-
+  var existingPosts = 1;
   // var existingPosts = postings.find({"email": req.body.email}).count()
   // .then(function(postResult){
   //     console.log("checking if post exists");
