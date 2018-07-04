@@ -193,8 +193,10 @@ function afterMakePost(req,res,next,existingPosts,samplePost){
     var latlongApart = kmApart/111.133;
     if (givenLatitude + latlongApart <= destLatitude && 
       givenLatitude - latlongApart >= destLatitude){
+      console.log("lat okay");
       if(givenLongitude + latlongApart <= destLongitude && 
         givenLongitude - latlongApart >= destLongitude){
+        console.log("long okay");
         return true;
       }
     } 
@@ -208,6 +210,7 @@ function afterMakePost(req,res,next,existingPosts,samplePost){
   for(var i = 0; i < userArray.length; i++){
     if (calculateDistance(samplePost.latitude,samplePost.longitude,samplePost.distance,userArray[i].latitude,userArray[i].longitude)){
       newArray.push(userArray[i]);
+      console.log("post pushed");
     }
   }
   console.log("New array:");
