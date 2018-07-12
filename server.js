@@ -185,7 +185,7 @@ app.post('/makePost', function(req,res,next){
       console.log("removing old posts");
       existingPosts = postResult;
       afterMakePost(req,res,next,existingPosts,samplePost);
-    // });
+     });
 
 });
 
