@@ -28,6 +28,7 @@ MongoClient.connect(dburl, function(err, client){
   users = database.collection('users'); // db.documents
   postings = database.collection('postings');
 
+
   //collection.deleteMany();
 });
 
@@ -44,6 +45,8 @@ var options = {
   extensions: ['htm','html'],
   index: "index.html"
 }
+
+var timeStats = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 
 //viewing the request in console
 app.use('/', function(req,res,next){
@@ -145,8 +148,22 @@ app.get('/displayall', function(req,res,next){
 });
 
 app.get('/test/', function(req,res,next){
-  res.send("everything working");
-  console.log("test initiated");
+  var givenLatitude = 10;
+  var givenLongitude = 10;
+  var kmApart = 100;
+  var destLatitude = 9.9;
+  var destLongitude = 9.9;
+  var result = calculateDistance(givenLatitude,givenLongitude,kmApart,destLatitude,destLongitude); 
+  res.send(result);
+  console.log(result);
+  res.end();
+});
+
+app.get('/test2/', function(req,res,next){
+  var d = new Date();
+  timeStats[d.getHours()] += 1;
+  console.log(timeStats);
+  res.send(timeStats);
   res.end();
 });
 
@@ -162,20 +179,22 @@ app.post('/makePost', function(req,res,next){
     latitude: req.body.latitude,
     longitude: req.body.longitude
   };
-  var existingPosts = 1;
-  // var existingPosts = postings.find({"email": req.body.email}).count()
-  // .then(function(postResult){
-  //     console.log("checking if post exists");
-  //     existingPosts = postResult;
+ var existingPosts = 1;
+  var existingPosts = postings.remove({"email": req.body.email})
+  .then(function(postResult){
+      console.log("removing old posts");
+      existingPosts = postResult;
       afterMakePost(req,res,next,existingPosts,samplePost);
     // });
 
 });
 
+
 //to prevent async problems in making a post
 function afterMakePost(req,res,next,existingPosts,samplePost){
   var userjson;
   var loadeduser;
+  console.log("existingpotsts is: " + existingPosts);
   // if (existingPosts >= 1){
   //   console.log("Post already exists");
   // }
@@ -201,9 +220,9 @@ function afterMakePost(req,res,next,existingPosts,samplePost){
     console.log("calcdistance entered: " + givenLatitude);
     console.log(destLatitude);
     console.log(kmApart);
-    if ((givenLatitude - kmApart) <= destLatitude || (givenLatitude + kmApart) >= destLatitude){
+    if (Math.abs(givenLongitude - destLongitude) <= latlongApart){
       console.log("lat okay");
-      if((givenLongitude - kmApart) <= destLongitude || (givenLongitude + kmApart) >= destLongitude){
+      if(Math.abs(givenLatitude - destLatitude) <= latlongApart){
         console.log("long okay");
         return true;
       }
