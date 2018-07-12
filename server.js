@@ -238,8 +238,11 @@ function afterMakePost(req,res,next,existingPosts,samplePost){
   for(var i = 0; i < userArray.length; i++){
     console.log("i = " + i);
     if (calculateDistance(samplePost.latitude,samplePost.longitude,samplePost.distance,userArray[i].latitude,userArray[i].longitude)){
-      newArray.push(userArray[i]);
-      console.log("post pushed");
+      if(userArray[i].email != samplePost.email){
+        newArray.push(userArray[i]);
+        console.log("post pushed");
+      }
+      
     }
   }
   console.log("New array:");
