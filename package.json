@@ -5,9 +5,10 @@
   "dependencies": {
     "express": "4.16.0",
     "mongodb": "^3.1.0",
-    "serve-index": "^1.9.1"
+    "serve-index": "^1.9.1",
+    "socket.io": "latest"
   },
   "scripts": {
-  	"start": "node server.js"
+    "start": "node server.js"
   }
 }

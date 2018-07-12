@@ -245,7 +245,7 @@ function afterMakePost(req,res,next,existingPosts,samplePost){
       
     }
   }
-  console.log("New array:");
+  console.log("New array:"); 
   console.log(newArray);
   res.send(newArray);
   res.end();
