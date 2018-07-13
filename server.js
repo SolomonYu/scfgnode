@@ -247,6 +247,12 @@ function afterMakePost(req,res,next,existingPosts,samplePost){
   }
   console.log("New array:"); 
   console.log(newArray);
+
+  //adding to time statistics:
+  var d = new Date();
+  timeStats[d.getHours()] += 1;
+  console.log(timeStats);
+
   res.send(newArray);
   res.end();
 }
