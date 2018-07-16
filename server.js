@@ -10,6 +10,7 @@ var express = require('express');
 var path = require('path');
 var MongoClient = require('mongodb').MongoClient;
 var serverIndex = require('serve-index');
+var io = require('socket.io')(http);
  
  //setting ports, intializing app
 var app = express();
@@ -56,6 +57,52 @@ app.use('/', function(req,res,next){
 
 app.use('/', express.static('./pub_html', options));
 app.use(express.json());
+
+//socket methods: used for chat rooms
+io.on('connection', function(socket){
+  console.log("Additional user connected");
+  socket.on('disconnect', function(){
+    console.log("User disconnected");
+  });
+
+  socket.on('chatMessage', function(msg){
+    console.log('message: ' + msg);
+    io.emit('chatMessage', msg);
+  });
+});
+
+//testing site for socket functions:
+app.get('/chatTest', function(req,res){
+  res.send(`<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+
+  </head>
+  <body>
+    <ul id="messages"></ul>
+    <form action="">
+      <input id="m" autocomplete="off" /><button>Send</button>
+    </form>
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+      $(function () {
+        var socket = io();
+        $('form').submit(function(){
+          socket.emit('chat message', $('#m').val());
+          $('#m').val('');
+          return false;
+        });
+        socket.on('chat message', function(msg){
+          $('#messages').append($('<li>').text(msg));
+          window.scrollTo(0, document.body.scrollHeight);
+        });
+      });
+    </script>
+  </body>
+</html>`);
+});
 
 
 //For signing in: See if user exists, if not, then put a new user into db
