@@ -22,12 +22,14 @@ var dburl = "mongodb://admin:123456a@ds018238.mlab.com:18238/scfgdatabase";
 var database;
 var users;
 var postings;
+var stats;
 MongoClient.connect(dburl, function(err, client){
   if (err) console.log(err);
   console.log('database connected');
   database = client.db('scfgdatabase'); // use
   users = database.collection('users'); // db.documents
   postings = database.collection('postings');
+  //stats = database.collection('stats');
 
 
   //collection.deleteMany();
@@ -186,6 +188,23 @@ app.get('/test2/', function(req,res,next){
   res.end();
 });
 
+//delete all of user's posts, where user is req.body.email
+app.post('/deleteMyPost', function(req,res,next){
+  var myPosts = postings.remove({"email": req.body.email})
+  .then(function(postResult){
+      console.log("removing my posts");
+      myPosts = postResult;
+      afterDelete(req,res,next,myPosts);
+     });
+});
+
+afterDelete(req,res,next,myPosts){
+  console.log("deletion success");
+  res.send(true);
+  res.end();
+
+}
+
 //creating a post, takes a posting object as a json from client
 app.post('/makePost', function(req,res,next){
   console.log(req.body);
@@ -236,13 +255,10 @@ function afterMakePost(req,res,next,existingPosts,samplePost){
 //return either true or false based on whether desination is within kmApart
   function calculateDistance(givenLatitude,givenLongitude,kmApart,destLatitude,destLongitude){
     var latlongApart = kmApart/111.133;
-    console.log("calcdistance entered: " + givenLatitude);
-    console.log(destLatitude);
-    console.log(kmApart);
     if (Math.abs(givenLongitude - destLongitude) <= latlongApart){
-      console.log("lat okay");
+      //console.log("lat okay");
       if(Math.abs(givenLatitude - destLatitude) <= latlongApart){
-        console.log("long okay");
+        //console.log("long okay");
         return true;
       }
     } 
@@ -275,6 +291,14 @@ function afterMakePost(req,res,next,existingPosts,samplePost){
   res.send(newArray);
   res.end();
 }
+
+
+//view time stats
+app.get('getTimeStats', function (req,res,next){
+  console.log("sending time stats to a user");
+  res.send(timeStats);
+  res.end();
+});
 
 
 
