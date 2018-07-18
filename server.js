@@ -212,6 +212,7 @@ app.post('/makePost', function(req,res,next){
   var samplePost = {
     email: req.body.email,
     time: req.body.time,
+    date: req.body.time,
     fullName: req.body.fullName,
     distance: req.body.distance,
     latitude: req.body.latitude,
