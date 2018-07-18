@@ -198,7 +198,7 @@ app.post('/deleteMyPost', function(req,res,next){
      });
 });
 
-afterDelete(req,res,next,myPosts){
+function afterDelete(req,res,next,myPosts){
   console.log("deletion success");
   res.send(true);
   res.end();
