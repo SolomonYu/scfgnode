@@ -298,7 +298,7 @@ function afterMakePost(req,res,next,existingPosts,samplePost){
     secondsTilDelete = 60000*req.body.time;
   }
   //temp for testing
-  secondsTilDelete = 60000;
+  //secondsTilDelete = 60000;
   setTimeout(deletePost, secondsTilDelete, req.body.email);
 
 
