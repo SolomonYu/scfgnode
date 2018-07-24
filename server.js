@@ -2,6 +2,9 @@
 //June 2018
 //For cmpt 276 Dine Together Project
 //Team members: Savtoz, Justin, Austin, Raad
+//This server handles the data for the users, postings, and stats the times users log in
+//Data is stored externally on mlab
+//Another server will be used for chat functionality
 
 
 
@@ -284,6 +287,21 @@ function afterMakePost(req,res,next,existingPosts,samplePost){
   console.log("New array:"); 
   console.log(newArray);
 
+  //setting up timer for deletion
+  console.log("setting timer for deletion");
+  var secondsTilDelete;
+  if (req.body.time > 90){
+    //make max time 1 hour
+    secondsTilDelete = 3600000;
+  }
+  else{
+    secondsTilDelete = 60000*req.body.time;
+  }
+  //temp for testing
+  secondsTilDelete = 60000;
+  setTimeout(deletePost, secondsTilDelete, req.body.email);
+
+
   //adding to time statistics:
   var d = new Date();
   timeStats[d.getHours()] += 1;
@@ -293,9 +311,15 @@ function afterMakePost(req,res,next,existingPosts,samplePost){
   res.end();
 }
 
+function deletePost(email){
+console.log("deletion in progress for: " + email);
+postings.remove({"email": email});
+console.log("deletion completed");
+}
+
 
 //view time stats
-app.get('getTimeStats', function (req,res,next){
+app.get('/getTimeStats', function (req,res,next){
   console.log("sending time stats to a user");
   res.send(timeStats);
   res.end();
