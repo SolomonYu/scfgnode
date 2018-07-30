@@ -169,22 +169,53 @@ app.post('/updateDescription/', function(req,res,next){
   res.end();
 });
 
-//updates a user's history of other users talked to
+//updates a user's history with a single new friend, also
+//checks if they already have that friend
 app.post('/updateFriends/', function(req,res,next){
   var newFriendId = req.body.friendId;
   var newFriendName = req.body.friendName
   var userToUpdate = req.body.userId;
 
-  var toSearchfor = { "friends": userToUpdate };
-  var toSet = { $set: { friends : newFriends } };
-
-  users.update(toSearchfor,toSet, function(err,res){
-    if(err) throw err;
-    console.log("user friends updated");
+  var loaddeduser;
+  users.findOne({"email":userToUpdate})
+  .then(function(tempuser){
+  	loadeduser = tempuser;
+  	afterUpdateFriend(req,res,next,loadeduser,newFriendId,newFriendName);
   });
-//  res.send();
-  res.end();
+
+
 });
+
+function afterUpdateFriend(req,res,next,loadeduser,newFriendId,newFriendName){
+	var allFriends = loadeduser.friends;
+	var friendCount = allFriends.length;
+
+	var newFriendObject = {
+		friendId: newFriendId,
+		friendName: newFriendName
+	}
+
+	var isFriendFound = false;
+	for (var i = 0; i < friendCount; i++){
+		if(allFriends[i].friendId == newFriendId){
+			isFriendFound = true;
+		}
+	}
+	if (isFriendFound == false){
+		allFriends.push(newFriendObject);
+		console.log("new friend found");
+	}
+
+
+	var toSearchfor = { "friends": req.body.userId };
+  	var toSet = { $set: { friends : newFriends } };
+
+ 	users.update(toSearchfor,toSet, function(err,res){
+    	if(err) throw err;
+    	console.log("user friends updated");
+  	});
+
+}
 
 //gets all a user's friends
 app.post('/findMyFriends/', function(req,res,next){
@@ -193,12 +224,12 @@ app.post('/findMyFriends/', function(req,res,next){
   users.findOne({"email":myEmail})
   .then(function(tempuser){
   	loadeduser = tempuser;
-
+  	afterFindFriend(req,res,next,loadeduser);
   });
 });
 
 function afterFindFriend(req,res,next,loadedUser){
-	console.log(loadeduser.friends);
+	console.log(loadedUser.friends);
 	res.send(loadeduser.friends);
 	res.end();
 }
