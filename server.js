@@ -105,7 +105,7 @@ function existCheck(req,res,next,existingusers,userToFind){
     users.findOne({"email": userToFind})
     .then(function(tempuser){
       loadeduser = tempuser;
-      loadThisThing(req,res,next,loadeduser);
+      loadUserWithoutFriend(req,res,next,loadeduser);
     });
 
   }
@@ -114,7 +114,8 @@ function existCheck(req,res,next,existingusers,userToFind){
     var sampleUser = {
       fullName: req.body.fullName,
       email: req.body.email,
-      description: "No description currently given"
+      description: "No description currently given",
+      friends: []
     };
     console.log(sampleUser);
     //put player into database
@@ -125,11 +126,22 @@ function existCheck(req,res,next,existingusers,userToFind){
     users.findOne({"email": userToFind})
     .then(function(tempuser){
       loadeduser = tempuser;
-      loadThisThing(req,res,next,loadeduser);
+      loadUserWithoutFriend(req,res,next,loadeduser);
     });
 
 
   }
+}
+
+//sending the same user object, but removing the friend element
+function loadUserWithoutFriend(req,res,next,toLoad){
+	var nonFrienduser = {
+		fullName: toLoad.fullName,
+		email: toLoad.email,
+		description: toLoad.description
+	};
+	res.send(toLoad);
+  	res.end();
 }
 
 //sends whatever object(toLoad) is passed through this function
@@ -159,10 +171,11 @@ app.post('/updateDescription/', function(req,res,next){
 
 //updates a user's history of other users talked to
 app.post('/updateFriends/', function(req,res,next){
-  var newFriends = req.body.friends;
-  var userToUpdate = req.body.email;
+  var newFriendId = req.body.friendId;
+  var newFriendName = req.body.friendName
+  var userToUpdate = req.body.userId;
 
-  var toSearchfor = { "email": userToUpdate };
+  var toSearchfor = { "friends": userToUpdate };
   var toSet = { $set: { friends : newFriends } };
 
   users.update(toSearchfor,toSet, function(err,res){
@@ -176,8 +189,19 @@ app.post('/updateFriends/', function(req,res,next){
 //gets all a user's friends
 app.post('/findMyFriends/', function(req,res,next){
   var myEmail = req.body.email;
+  var loadeduser;
+  users.findOne({"email":myEmail})
+  .then(function(tempuser){
+  	loadeduser = tempuser;
 
+  });
 });
+
+function afterFindFriend(req,res,next,loadedUser){
+	console.log(loadeduser.friends);
+	res.send(loadeduser.friends);
+	res.end();
+}
 
 ///show all users in database
 //for testing purposes only, to be removed in final version
