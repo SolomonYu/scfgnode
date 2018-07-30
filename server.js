@@ -52,6 +52,7 @@ var options = {
   index: "index.html"
 }
 
+//each element is how many logins on the ith hour
 var timeStats = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 
 //viewing the request in console
@@ -113,7 +114,7 @@ function existCheck(req,res,next,existingusers,userToFind){
     var sampleUser = {
       fullName: req.body.fullName,
       email: req.body.email,
-      description: ""
+      description: "No description currently given"
     };
     console.log(sampleUser);
     //put player into database
@@ -140,25 +141,43 @@ function loadThisThing(req,res,next,toLoad){
 }
 
 
-//updates database.. assume user also is updated locally, in interest of time
-//atm, this is just for testing
-app.get('/updateinfo/', function(req,res,next){
-  var fieldToUpdate = "name";
-  var aspectToUpdate = "newname";
-  var userToUpdate = "solomon@yes.com";
-  var updateStatus;
+//updates a user's description
+app.post('/updateDescription/', function(req,res,next){
+  var newDescription = req.body.description;
+  var userToUpdate = req.body.email;
 
   var toSearchfor = { "email": userToUpdate };
-  var toSet = { $set: { name : aspectToUpdate } };
+  var toSet = { $set: { description : newDescription } };
 
   users.update(toSearchfor,toSet, function(err,res){
     if(err) throw err;
-    console.log("user updated");
+    console.log("user description updated");
   });
-  res.send(aspectToUpdate);
+//  res.send();
   res.end();
 });
 
+//updates a user's history of other users talked to
+app.post('/updateFriends/', function(req,res,next){
+  var newFriends = req.body.friends;
+  var userToUpdate = req.body.email;
+
+  var toSearchfor = { "email": userToUpdate };
+  var toSet = { $set: { friends : newFriends } };
+
+  users.update(toSearchfor,toSet, function(err,res){
+    if(err) throw err;
+    console.log("user friends updated");
+  });
+//  res.send();
+  res.end();
+});
+
+//gets all a user's friends
+app.post('/findMyFriends/', function(req,res,next){
+  var myEmail = req.body.email;
+
+});
 
 ///show all users in database
 //for testing purposes only, to be removed in final version
@@ -219,7 +238,9 @@ app.post('/makePost', function(req,res,next){
     fullName: req.body.fullName,
     distance: req.body.distance,
     latitude: req.body.latitude,
-    longitude: req.body.longitude
+    longitude: req.body.longitude,
+    preference: req.body.preference,
+    //description: req.body.description
   };
  var existingPosts = 1;
   var existingPosts = postings.remove({"email": req.body.email})
@@ -278,8 +299,10 @@ function afterMakePost(req,res,next,existingPosts,samplePost){
     console.log("i = " + i);
     if (calculateDistance(samplePost.latitude,samplePost.longitude,samplePost.distance,userArray[i].latitude,userArray[i].longitude)){
       if(userArray[i].email != samplePost.email){
-        newArray.push(userArray[i]);
-        console.log("post pushed");
+        if(samplePost.preference == userArray[i].preference){
+          newArray.push(userArray[i]);
+          console.log("post pushed");
+        }
       }
       
     }
@@ -317,13 +340,15 @@ postings.remove({"email": email});
 console.log("deletion completed");
 }
 
-
-//view time stats
+ 
+//view time stats, where time stats is an array
 app.get('/getTimeStats', function (req,res,next){
   console.log("sending time stats to a user");
   res.send(timeStats);
   res.end();
 });
+
+
 
 
 
