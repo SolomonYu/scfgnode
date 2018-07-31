@@ -64,24 +64,6 @@ app.use('/', function(req,res,next){
 app.use('/', express.static('./pub_html', options));
 app.use(express.json());
 
-//socket methods: used for chat rooms
-io.on('connection', function(socket){
-  console.log("Additional user connected");
-  socket.on('disconnect', function(){
-    console.log("User disconnected");
-  });
-
-  socket.on('chatMessage', function(msg){
-    console.log('message: ' + msg);
-    io.emit('chatMessage', msg);
-  });
-});
-
-//testing site for socket functions:
-app.get('/chatTest', function(req,res){
-  res.sendFile(__dirname + '/chatTest.html');
-});
-
 
 //For signing in: See if user exists, if not, then put a new user into db
 //at the moment, also use this for getting user info
@@ -115,7 +97,8 @@ function existCheck(req,res,next,existingusers,userToFind){
       fullName: req.body.fullName,
       email: req.body.email,
       description: "No description currently given",
-      friends: []
+      friends: [],
+      preference: "0000000000"
     };
     console.log(sampleUser);
     //put player into database
@@ -165,6 +148,21 @@ app.post('/updateDescription/', function(req,res,next){
   users.update(toSearchfor,toSet, function(err,res){
     if(err) throw err;
     console.log("user description updated");
+  });
+//  res.send();
+  res.end();
+});
+
+app.post('/updatePreference/', function(req,res,next){
+  var newDescription = req.body.preference;
+  var userToUpdate = req.body.email;
+
+  var toSearchfor = { "email": userToUpdate };
+  var toSet = { $set: { preference : newDescription } };
+
+  users.update(toSearchfor,toSet, function(err,res){
+    if(err) throw err;
+    console.log("user pref updated");
   });
 //  res.send();
   res.end();
