@@ -391,7 +391,8 @@ function afterMakePost(req,res,next,existingPosts,samplePost){
 
   //adding to time statistics:
   var d = new Date();
-  timeStats[d.getHours()] += 1;
+  var hourChange = d.getHours() + 17;
+  timeStats[hourChange] += 1;
   console.log(timeStats);
 
   res.send(newArray);
