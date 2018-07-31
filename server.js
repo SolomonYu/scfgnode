@@ -224,6 +224,7 @@ function afterUpdateFriend(req,res,next,loadeduser,newFriendId,newFriendName){
 app.post('/findMyFriends/', function(req,res,next){
   var myEmail = req.body.email;
   var loadeduser;
+  console.log("loading friends");
   users.findOne({"email":myEmail})
   .then(function(tempuser){
   	loadeduser = tempuser;
