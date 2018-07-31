@@ -212,7 +212,7 @@ function afterUpdateFriend(req,res,next,loadeduser,newFriendId,newFriendName){
 
 
 	var toSearchfor = { "friends": req.body.userId };
-  	var toSet = { $set: { friends : newFriends } };
+  var toSet = { $set: { friends : allFriends } };
 
  	users.update(toSearchfor,toSet, function(err,res){
     	if(err) throw err;
