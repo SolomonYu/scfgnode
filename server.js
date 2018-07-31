@@ -211,7 +211,7 @@ function afterUpdateFriend(req,res,next,loadeduser,newFriendId,newFriendName){
 	}
 
   console.log("new friend list: " + allFriends);
-	var toSearchfor = { "friends": req.body.userId };
+	var toSearchfor = { "email": req.body.userId };
   var toSet = { $set: { friends : allFriends } };
 
  	users.update(toSearchfor,toSet, function(err,res){
@@ -220,8 +220,11 @@ function afterUpdateFriend(req,res,next,loadeduser,newFriendId,newFriendName){
   	});
 
   res.end();
-
 }
+
+// function afterafterUpdateFriend(req,res,next){
+//   res.end()
+// }
 
 //gets all a user's friends
 app.post('/findMyFriends/', function(req,res,next){
