@@ -172,6 +172,8 @@ app.post('/updateDescription/', function(req,res,next){
 //updates a user's history with a single new friend, also
 //checks if they already have that friend
 app.post('/updateFriends/', function(req,res,next){
+  console.log("updating friends");
+
   var newFriendId = req.body.friendId;
   var newFriendName = req.body.friendName
   var userToUpdate = req.body.userId;
@@ -189,7 +191,7 @@ app.post('/updateFriends/', function(req,res,next){
 function afterUpdateFriend(req,res,next,loadeduser,newFriendId,newFriendName){
 	var allFriends = loadeduser.friends;
 	var friendCount = allFriends.length;
-
+  console.log("after update friend");
 	var newFriendObject = {
 		friendId: newFriendId,
 		friendName: newFriendName
@@ -204,6 +206,7 @@ function afterUpdateFriend(req,res,next,loadeduser,newFriendId,newFriendName){
 	if (isFriendFound == false){
 		allFriends.push(newFriendObject);
 		console.log("new friend found");
+    console.log(newFriendObject);
 	}
 
 
