@@ -135,6 +135,7 @@ function existCheck(req,res,next,existingusers,userToFind){
 
 //sending the same user object, but removing the friend element
 function loadUserWithoutFriend(req,res,next,toLoad){
+  console.log("loading user without friend");
 	var nonFrienduser = {
 		fullName: toLoad.fullName,
 		email: toLoad.email,
