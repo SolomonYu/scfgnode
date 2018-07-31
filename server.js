@@ -362,10 +362,10 @@ function afterMakePost(req,res,next,existingPosts,samplePost){
     console.log("i = " + i);
     if (calculateDistance(samplePost.latitude,samplePost.longitude,samplePost.distance,userArray[i].latitude,userArray[i].longitude)){
       if(userArray[i].email != samplePost.email){
-        if(samplePost.preference == userArray[i].preference){
+        //if(samplePost.preference == userArray[i].preference){
           newArray.push(userArray[i]);
           console.log("post pushed");
-        }
+        //}
       }
       
     }
