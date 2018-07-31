@@ -122,7 +122,8 @@ function loadUserWithoutFriend(req,res,next,toLoad){
 	var nonFrienduser = {
 		fullName: toLoad.fullName,
 		email: toLoad.email,
-		description: toLoad.description
+		description: toLoad.description,
+    preference: toLoad.preference
 	};
 	res.send(toLoad);
   	res.end();
