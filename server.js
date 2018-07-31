@@ -210,7 +210,7 @@ function afterUpdateFriend(req,res,next,loadeduser,newFriendId,newFriendName){
     console.log(newFriendObject);
 	}
 
-
+  console.log("new friend list: " + allFriends);
 	var toSearchfor = { "friends": req.body.userId };
   var toSet = { $set: { friends : allFriends } };
 
@@ -218,6 +218,8 @@ function afterUpdateFriend(req,res,next,loadeduser,newFriendId,newFriendName){
     	if(err) throw err;
     	console.log("user friends updated");
   	});
+
+  res.end();
 
 }
 
