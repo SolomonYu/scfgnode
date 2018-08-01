@@ -408,6 +408,7 @@ console.log("deletion completed");
 //view time stats, where time stats is an array
 app.get('/getTimeStats', function (req,res,next){
   console.log("sending time stats to a user");
+  console.log(timeStats);
   res.send(timeStats);
   res.end();
 });
