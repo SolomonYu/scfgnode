@@ -390,7 +390,7 @@ function afterMakePost(req,res,next,existingPosts,samplePost){
 
   //adding to time statistics:
   var d = new Date();
-  var hourChange = d.getHours() + 17;
+  var hourChange = (d.getHours() + 17)%24;
   timeStats[hourChange] += 1;
   console.log(timeStats);
 
