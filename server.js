@@ -303,7 +303,7 @@ app.post('/makePost', function(req,res,next){
     latitude: req.body.latitude,
     longitude: req.body.longitude,
     preference: req.body.preference,
-    //description: req.body.description
+    description: req.body.description
   };
  var existingPosts = 1;
   var existingPosts = postings.remove({"email": req.body.email})
