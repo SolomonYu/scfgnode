@@ -2,9 +2,6 @@
 //June 2018
 //For cmpt 276 Dine Together Project
 //Team members: Savtoz, Justin, Austin, Raad
-//This server handles the data for the users, postings, and stats the times users log in
-//Data is stored externally on mlab
-//Another server will be used for chat functionality
 
 
 
@@ -52,7 +49,6 @@ var options = {
   index: "index.html"
 }
 
-//each element is how many logins on the ith hour
 var timeStats = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 
 //viewing the request in console
@@ -63,6 +59,24 @@ app.use('/', function(req,res,next){
 
 app.use('/', express.static('./pub_html', options));
 app.use(express.json());
+
+//socket methods: used for chat rooms
+io.on('connection', function(socket){
+  console.log("Additional user connected");
+  socket.on('disconnect', function(){
+    console.log("User disconnected");
+  });
+
+  socket.on('chatMessage', function(msg){
+    console.log('message: ' + msg);
+    io.emit('chatMessage', msg);
+  });
+});
+
+//testing site for socket functions:
+app.get('/chatTest', function(req,res){
+  res.sendFile(__dirname + '/chatTest.html');
+});
 
 
 //For signing in: See if user exists, if not, then put a new user into db
@@ -87,7 +101,7 @@ function existCheck(req,res,next,existingusers,userToFind){
     users.findOne({"email": userToFind})
     .then(function(tempuser){
       loadeduser = tempuser;
-      loadUserWithoutFriend(req,res,next,loadeduser);
+      loadThisThing(req,res,next,loadeduser);
     });
 
   }
@@ -96,9 +110,7 @@ function existCheck(req,res,next,existingusers,userToFind){
     var sampleUser = {
       fullName: req.body.fullName,
       email: req.body.email,
-      description: "No description currently given",
-      friends: [],
-      preference: "0000000000"
+      description: ""
     };
     console.log(sampleUser);
     //put player into database
@@ -109,24 +121,11 @@ function existCheck(req,res,next,existingusers,userToFind){
     users.findOne({"email": userToFind})
     .then(function(tempuser){
       loadeduser = tempuser;
-      loadUserWithoutFriend(req,res,next,loadeduser);
+      loadThisThing(req,res,next,loadeduser);
     });
 
 
   }
-}
-
-//sending the same user object, but removing the friend element
-function loadUserWithoutFriend(req,res,next,toLoad){
-  console.log("loading user without friend");
-	var nonFrienduser = {
-		fullName: toLoad.fullName,
-		email: toLoad.email,
-		description: toLoad.description,
-    preference: toLoad.preference
-	};
-	res.send(toLoad);
-  	res.end();
 }
 
 //sends whatever object(toLoad) is passed through this function
@@ -138,109 +137,25 @@ function loadThisThing(req,res,next,toLoad){
 }
 
 
-//updates a user's description
-app.post('/updateDescription/', function(req,res,next){
-  var newDescription = req.body.description;
-  var userToUpdate = req.body.email;
+//updates database.. assume user also is updated locally, in interest of time
+//atm, this is just for testing
+app.get('/updateinfo/', function(req,res,next){
+  var fieldToUpdate = "name";
+  var aspectToUpdate = "newname";
+  var userToUpdate = "solomon@yes.com";
+  var updateStatus;
 
   var toSearchfor = { "email": userToUpdate };
-  var toSet = { $set: { description : newDescription } };
+  var toSet = { $set: { name : aspectToUpdate } };
 
   users.update(toSearchfor,toSet, function(err,res){
     if(err) throw err;
-    console.log("user description updated");
+    console.log("user updated");
   });
-//  res.send();
+  res.send(aspectToUpdate);
   res.end();
 });
 
-app.post('/updatePreference/', function(req,res,next){
-  var newDescription = req.body.preference;
-  var userToUpdate = req.body.email;
-
-  var toSearchfor = { "email": userToUpdate };
-  var toSet = { $set: { preference : newDescription } };
-
-  users.update(toSearchfor,toSet, function(err,res){
-    if(err) throw err;
-    console.log("user pref updated");
-  });
-//  res.send();
-  res.end();
-});
-
-//updates a user's history with a single new friend, also
-//checks if they already have that friend
-app.post('/updateFriends/', function(req,res,next){
-  console.log("updating friends");
-
-  var newFriendId = req.body.friendId;
-  var newFriendName = req.body.friendName
-  var userToUpdate = req.body.userId;
-
-  var loaddeduser;
-  users.findOne({"email":userToUpdate})
-  .then(function(tempuser){
-  	loadeduser = tempuser;
-  	afterUpdateFriend(req,res,next,loadeduser,newFriendId,newFriendName);
-  });
-
-
-});
-
-function afterUpdateFriend(req,res,next,loadeduser,newFriendId,newFriendName){
-	var allFriends = loadeduser.friends;
-	var friendCount = allFriends.length;
-  console.log("after update friend");
-	var newFriendObject = {
-		friendId: newFriendId,
-		friendName: newFriendName
-	}
-
-	var isFriendFound = false;
-	for (var i = 0; i < friendCount; i++){
-		if(allFriends[i].friendId == newFriendId){
-			isFriendFound = true;
-		}
-	}
-	if (isFriendFound == false){
-		allFriends.push(newFriendObject);
-		console.log("new friend found");
-    console.log(newFriendObject);
-	}
-
-  console.log("new friend list: " + allFriends);
-	var toSearchfor = { "email": req.body.userId };
-  var toSet = { $set: { friends : allFriends } };
-
- 	users.update(toSearchfor,toSet, function(err,res){
-    	if(err) throw err;
-    	console.log("user friends updated");
-  	});
-
-  res.end();
-}
-
-// function afterafterUpdateFriend(req,res,next){
-//   res.end()
-// }
-
-//gets all a user's friends
-app.post('/findMyFriends/', function(req,res,next){
-  var myEmail = req.body.email;
-  var loadeduser;
-  console.log("loading friends of " + myEmail);
-  users.findOne({"email":myEmail}).then(function(tempuser){
-  	loadeduser = tempuser;
-  	afterFindFriend(req,res,next,loadeduser);
-  });
-});
-
-function afterFindFriend(req,res,next,loadedUser){
-	console.log(loadedUser.friends);
-	res.send(loadedUser.friends);
-	res.end();
-}
 
 ///show all users in database
 //for testing purposes only, to be removed in final version
@@ -301,9 +216,7 @@ app.post('/makePost', function(req,res,next){
     fullName: req.body.fullName,
     distance: req.body.distance,
     latitude: req.body.latitude,
-    longitude: req.body.longitude,
-    preference: req.body.preference,
-    description: req.body.description
+    longitude: req.body.longitude
   };
  var existingPosts = 1;
   var existingPosts = postings.remove({"email": req.body.email})
@@ -362,10 +275,8 @@ function afterMakePost(req,res,next,existingPosts,samplePost){
     console.log("i = " + i);
     if (calculateDistance(samplePost.latitude,samplePost.longitude,samplePost.distance,userArray[i].latitude,userArray[i].longitude)){
       if(userArray[i].email != samplePost.email){
-        //if(samplePost.preference == userArray[i].preference){
-          newArray.push(userArray[i]);
-          console.log("post pushed");
-        //}
+        newArray.push(userArray[i]);
+        console.log("post pushed");
       }
       
     }
@@ -373,47 +284,22 @@ function afterMakePost(req,res,next,existingPosts,samplePost){
   console.log("New array:"); 
   console.log(newArray);
 
-  //setting up timer for deletion
-  console.log("setting timer for deletion");
-  var secondsTilDelete;
-  if (req.body.time > 90){
-    //make max time 1 hour
-    secondsTilDelete = 3600000;
-  }
-  else{
-    secondsTilDelete = 60000*req.body.time;
-  }
-  //temp for testing
-  //secondsTilDelete = 60000;
-  setTimeout(deletePost, secondsTilDelete, req.body.email);
-
-
   //adding to time statistics:
   var d = new Date();
-  var hourChange = (d.getHours() + 17)%24;
-  timeStats[hourChange] += 1;
+  timeStats[d.getHours()] += 1;
   console.log(timeStats);
 
   res.send(newArray);
   res.end();
 }
 
-function deletePost(email){
-console.log("deletion in progress for: " + email);
-postings.remove({"email": email});
-console.log("deletion completed");
-}
 
- 
-//view time stats, where time stats is an array
-app.get('/getTimeStats', function (req,res,next){
+//view time stats
+app.get('getTimeStats', function (req,res,next){
   console.log("sending time stats to a user");
-  console.log(timeStats);
   res.send(timeStats);
   res.end();
 });
-
-
 
 
 
